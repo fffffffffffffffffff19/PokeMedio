@@ -1,5 +1,3 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { SlashCommandBuilder } from 'discord.js';
 
-module.exports = new SlashCommandBuilder()
-    .setName('play')
-    .setDescription('Start game.')
+export default new SlashCommandBuilder().setName('play').setDescription('Start game.');

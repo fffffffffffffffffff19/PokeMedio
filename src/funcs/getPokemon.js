@@ -1,16 +1,8 @@
-module.exports = async () => {
-    const api = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0`)
-    const data = await api.json();
-    const pokemon = data.results
-        .map((r) => r.name)
-        .filter(Boolean)
-        .filter(name => /^[A-Za-z]+$/.test(name));
+import db from '../database/db.js';
 
-    if (pokemon.length === 0) return 'Unknown';
+export function getRandomPokemon() {
+    const stmt = db.prepare("SELECT name FROM game_items WHERE type = 'pokemon' ORDER BY RANDOM() LIMIT 1");
+    const result = stmt.get();
 
-    let name = pokemon[Math.floor(Math.random() * pokemon.length)];
-
-    name = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-
-    return name;
+    return result ? result.name : null;
 }
