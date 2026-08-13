@@ -1,8 +1,11 @@
-require('winston-daily-rotate-file');
-const { resolve } = require('node:path');
-const { createLogger, format, transports } = require('winston');
+import 'winston-daily-rotate-file';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createLogger, format, transports } from 'winston';
 
 const { combine, timestamp, label, printf, colorize, uncolorize } = format;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 class Logger {
     constructor() {
@@ -42,4 +45,4 @@ class Logger {
     }
 }
 
-module.exports = new Logger();
+export default new Logger();

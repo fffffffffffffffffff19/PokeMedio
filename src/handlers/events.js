@@ -1,15 +1,23 @@
-const { findEvents } = require('../class/fileExplorer');
-const { createLogger } = require('../class/logger');
+import fileExplorer from '../class/fileExplorer.js';
+import logger from '../class/logger.js';
 
-module.exports = (client) => {
+const { createLogger, fileName } = logger;
+
+export default async (client) => {
     try {
-        for (const event of findEvents()) {
-            if (!event.name) return;
-            if (event.once) client.once(event.name, (...args) => event.execute(...args));
-            else client.on(event.name, (...args) => event.execute(...args));
+        // Chamando direto de 'fileExplorer' para preservar o contexto do 'this'
+        const events = await fileExplorer.findEvents();
+
+        for (const event of events) {
+            if (!event.name) continue; // Usando 'continue' para pular itens sem nome sem parar o loop
+            
+            if (event.once) {
+                client.once(event.name, (...args) => event.execute(...args));
+            } else {
+                client.on(event.name, (...args) => event.execute(...args));
+            }
         }
     } catch (error) {
-        console.log(error);
-        createLogger.error(__filename, error);
+        createLogger.error(fileName, error);
     }
 };

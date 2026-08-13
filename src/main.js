@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits } = require('discord.js');
+import { Client, GatewayIntentBits } from 'discord.js';
 
 class PokeMedio {
     constructor () {
@@ -13,4 +13,4 @@ class PokeMedio {
     }
 }
 
-module.exports = new PokeMedio();
+export default new PokeMedio();

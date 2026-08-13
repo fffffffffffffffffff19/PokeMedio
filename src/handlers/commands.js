@@ -1,13 +1,22 @@
-const { Collection, Events, MessageFlags } = require('discord.js');
-const { findCommands } = require('../class/fileExplorer');
-const { createLogger } = require('../class/logger');
+import { Collection, Events, MessageFlags } from 'discord.js';
+import logger from '../class/logger.js';
+import fileExplorer from '../class/fileExplorer.js';
 
-module.exports = (client) => {
+const { createLogger, fileName } = logger;
+
+export default async (client) => {
     client.commands = new Collection();
 
-    for (const command of findCommands()) {
-        if ('data' in command && 'execute' in command) client.commands.set(command.data.name, command);
-        else createLogger.warn('One or more commands not contain "id" or "execute".');
+    const rawCommands = await fileExplorer.findCommands();
+
+    for (const rawCommand of rawCommands) {
+        const command = rawCommand.default ?? rawCommand;
+
+        if ('data' in command && 'execute' in command) {
+            client.commands.set(command.data.name, command);
+        } else {
+            createLogger.warn('One or more commands do not contain "data" or "execute".');
+        }
     }
 
     client.on(Events.InteractionCreate, async (interaction) => {
@@ -20,16 +29,14 @@ module.exports = (client) => {
         try {
             await interaction.client.commands.get(interaction.commandName).execute(interaction);
         } catch (error) {
+            createLogger.error(fileName, error);
+
             if (interaction.replied || interaction.deferred) {
-                console.log(error);
-                createLogger.error(__filename, error);
                 await interaction.followUp({
                     content: 'There was an error while executing this command!',
                     flags: MessageFlags.Ephemeral,
                 });
             } else {
-                console.log(error);
-                createLogger.error(__filename, error);
                 await interaction.reply({
                     content: 'There was an error while executing this command!',
                     flags: MessageFlags.Ephemeral,
