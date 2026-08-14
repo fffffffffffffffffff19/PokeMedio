@@ -14,12 +14,12 @@ export default {
         const totalItems = db.prepare('SELECT COUNT(*) AS total FROM game_items').get().total;
 
         if (totalItems === 0) {
-            console.log('[DB] Banco de dados vazio. Iniciando primeira sincronização...');
+            console.log('[DB] Database is empty. Starting initial synchronization...');
             await syncPokemons();
             await syncMedicines();
-            console.log('[DB] Sincronização inicial concluída com sucesso!');
+            console.log('[DB] Initial synchronization completed successfully!');
         } else {
-            console.log(`[DB] Banco SQLite pronto com ${totalItems} itens cadastrados.`);
+            console.log(`[DB] SQLite database ready with ${totalItems} registered items.`);
         }
     },
 };
