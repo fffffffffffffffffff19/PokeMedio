@@ -1,5 +1,6 @@
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } from 'discord.js';
 import { getRandomGameItem } from '../../funcs/getRandom.js';
+import { questionEmbed, resultEmbed, timeoutEmbed } from './embeds.js'
 
 export default async (interaction) => {
     const item = getRandomGameItem();
@@ -25,15 +26,8 @@ export default async (interaction) => {
 
     const row = new ActionRowBuilder().addComponents(pokemonBtn, medicineBtn);
 
-    const questionEmbed = new EmbedBuilder()
-        .setTitle('❓ Pokémon ou Remédio?')
-        .setDescription(`O item **\`${item.name}\`** é um Pokémon ou um Remédio?`)
-        .setColor('#5865F2')
-        .setFooter({ text: 'Você tem 15 segundos para responder!' })
-        .setTimestamp();
-
     const response = await interaction.reply({
-        embeds: [questionEmbed],
+        embeds: [questionEmbed(item)],
         components: [row],
         fetchReply: true
     });
@@ -50,17 +44,8 @@ export default async (interaction) => {
         pokemonBtn.setDisabled(true);
         medicineBtn.setDisabled(true);
 
-        const resultEmbed = new EmbedBuilder()
-            .setTitle(isCorrect ? '🎉 Acertou!' : '❌ Errou!')
-            .setDescription(
-                isCorrect
-                    ? `Parabéns **${i.user.username}**! **\`${item.name}\`** realmente é um **${item.type === 'pokemon' ? 'Pokémon 🔴' : 'Remédio 💊'}**!`
-                    : `Que pena **${i.user.username}**! **\`${item.name}\`** na verdade é um **${item.type === 'pokemon' ? 'Pokémon 🔴' : 'Remédio 💊'}**!`
-            )
-            .setColor(isCorrect ? '#57F287' : '#ED4245');
-
         await i.update({
-            embeds: [resultEmbed],
+            embeds: [resultEmbed(i, item, isCorrect)],
             components: [new ActionRowBuilder().addComponents(pokemonBtn, medicineBtn)]
         });
 
@@ -73,13 +58,8 @@ export default async (interaction) => {
         pokemonBtn.setDisabled(true);
         medicineBtn.setDisabled(true);
 
-        const timeoutEmbed = new EmbedBuilder()
-            .setTitle('⏰ Tempo Esgotado!')
-            .setDescription(`Você demorou muito para responder! **\`${item.name}\`** é um **${item.type === 'pokemon' ? 'Pokémon 🔴' : 'Remédio 💊'}**.`)
-            .setColor('#FEE75C');
-
         interaction.editReply({
-            embeds: [timeoutEmbed],
+            embeds: [timeoutEmbed(item)],
             components: [new ActionRowBuilder().addComponents(pokemonBtn, medicineBtn)]
         }).catch(() => {});
     });
