@@ -1,6 +1,7 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } from 'discord.js';
+import { ActionRowBuilder, ComponentType } from 'discord.js';
 import { getRandomGameItem } from '../../funcs/getRandom.js';
 import { questionEmbed, resultEmbed, timeoutEmbed } from './embeds.js'
+import { medicineBtn, pokemonBtn } from './buttons.js'
 
 export default async (interaction) => {
     const item = getRandomGameItem();
@@ -12,19 +13,10 @@ export default async (interaction) => {
         });
     }
 
-    const pokemonBtn = new ButtonBuilder()
-        .setCustomId('btn_pokemon')
-        .setLabel('Pokémon')
-        .setEmoji('🔴')
-        .setStyle(ButtonStyle.Primary);
+    const pokeButton = pokemonBtn();
+    const medicineButton = medicineBtn();
 
-    const medicineBtn = new ButtonBuilder()
-        .setCustomId('btn_medicine')
-        .setLabel('Remédio')
-        .setEmoji('💊')
-        .setStyle(ButtonStyle.Success);
-
-    const row = new ActionRowBuilder().addComponents(pokemonBtn, medicineBtn);
+    const row = new ActionRowBuilder().addComponents(pokeButton, medicineButton);
 
     const response = await interaction.reply({
         embeds: [questionEmbed(item)],
@@ -41,12 +33,12 @@ export default async (interaction) => {
         const chosenType = i.customId === 'btn_pokemon' ? 'pokemon' : 'medicine';
         const isCorrect = chosenType === item.type;
 
-        pokemonBtn.setDisabled(true);
-        medicineBtn.setDisabled(true);
+        pokeButton.setDisabled(true);
+        medicineButton.setDisabled(true);
 
         await i.update({
             embeds: [resultEmbed(i, item, isCorrect)],
-            components: [new ActionRowBuilder().addComponents(pokemonBtn, medicineBtn)]
+            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton)]
         });
 
         collector.stop('answered');
@@ -55,12 +47,12 @@ export default async (interaction) => {
     collector.on('end', (collected, reason) => {
         if (reason === 'answered') return;
 
-        pokemonBtn.setDisabled(true);
-        medicineBtn.setDisabled(true);
+        pokeButton.setDisabled(true);
+        medicineButton.setDisabled(true);
 
         interaction.editReply({
             embeds: [timeoutEmbed(item)],
-            components: [new ActionRowBuilder().addComponents(pokemonBtn, medicineBtn)]
+            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton)]
         }).catch(() => {});
     });
 }
