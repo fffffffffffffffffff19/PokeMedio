@@ -1,7 +1,8 @@
 import { ActionRowBuilder, ComponentType } from 'discord.js';
 import { getRandomGameItem } from '../../funcs/getRandom.js';
-import { questionEmbed, resultEmbed, timeoutEmbed } from './embeds.js'
+import { questionEmbed, correctEmbed, wrongEmbed,timeoutEmbed, newPoint } from './embeds.js'
 import { medicineBtn, pokemonBtn } from './buttons.js'
+import { insertScore } from '../../funcs/insertScore.js'
 
 export default async (interaction) => {
     const item = getRandomGameItem();
@@ -36,8 +37,19 @@ export default async (interaction) => {
         pokeButton.setDisabled(true);
         medicineButton.setDisabled(true);
 
+        if (isCorrect == true) {
+            insertScore(i.user);
+
+            await i.update({
+                embeds: [correctEmbed(i, item), newPoint(i.user)],
+                components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton)]
+            });
+
+            return collector.stop('answered');
+        }
+
         await i.update({
-            embeds: [resultEmbed(i, item, isCorrect)],
+            embeds: [wrongEmbed(i, item)],
             components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton)]
         });
 

@@ -1,4 +1,5 @@
 import { EmbedBuilder } from "discord.js";
+import { getRank } from "../../funcs/getRank.js";
 
 export function questionEmbed(item) {
 	return new EmbedBuilder()
@@ -9,20 +10,32 @@ export function questionEmbed(item) {
 		.setTimestamp();
 };
 
-export function resultEmbed(i, item, isCorrect) {
+export function correctEmbed(i, item) {
 	return new EmbedBuilder()
-		.setTitle(isCorrect ? '🎉 Acertou!' : '❌ Errou!')
-		.setDescription(
-			isCorrect
-				? `Parabéns **${i.user.username}**! **\`${item.name}\`** realmente é um **${item.type === 'pokemon' ? 'Pokémon 🔴' : 'Remédio 💊'}**!`
-				: `Que pena **${i.user.username}**! **\`${item.name}\`** na verdade é um **${item.type === 'pokemon' ? 'Pokémon 🔴' : 'Remédio 💊'}**!`
-		)
-		.setColor(isCorrect ? '#57F287' : '#ED4245');
+		.setTitle('🎉 Acertou!')
+		.setDescription(`Parabéns **${i.user.username}**! **\`${item.name}\`** realmente é um **${item.type === 'pokemon' ? 'Pokémon 🔴' : 'Remédio 💊'}**!`)
+		.setColor('#57F287');
 };
+
+export function wrongEmbed(i, item) {
+	return new EmbedBuilder()
+		.setTitle('❌ Errou!')
+		.setDescription(`Que pena **${i.user.username}**! **\`${item.name}\`** na verdade é um **${item.type === 'pokemon' ? 'Pokémon 🔴' : 'Remédio 💊'}**!`)
+		.setColor('#ED4245');
+}
 
 export function timeoutEmbed(item) {
 	return new EmbedBuilder()
-            .setTitle('⏰ Tempo Esgotado!')
-            .setDescription(`Você demorou muito para responder! **\`${item.name}\`** é um **${item.type === 'pokemon' ? 'Pokémon 🔴' : 'Remédio 💊'}**.`)
-            .setColor('#FEE75C');
+		.setTitle('⏰ Tempo Esgotado!')
+		.setDescription(`Você demorou muito para responder! **\`${item.name}\`** é um **${item.type === 'pokemon' ? 'Pokémon 🔴' : 'Remédio 💊'}**.`)
+		.setColor('#FEE75C');
+};
+
+export function newPoint(user) {
+	const userRank = getRank(user);
+
+	return new EmbedBuilder()
+		.setTitle('🏅 +1 Score!')
+		.setDescription(`<@${user.id}> esta em Rank: **#${userRank.position}** com **${userRank.score}** pontos!`)
+		.setColor("Gold");
 };
