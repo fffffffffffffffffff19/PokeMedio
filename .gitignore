@@ -140,3 +140,5 @@ vite.config.ts.timestamp-*
 
 # Sqlite3
 *.db
+*.db-wal
+*.db-shm
