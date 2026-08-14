@@ -1,7 +1,7 @@
 import db from './db.js';
 
 export async function syncPokemons() {
-    console.log('[DB] Iniciando busca de Pokémon na PokéAPI...');
+    console.log('[DB] Fetching Pokémon from PokéAPI...');
     try {
         const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0');
         const data = await res.json();
@@ -23,17 +23,16 @@ export async function syncPokemons() {
         });
 
         insertMany(uniquePokemons);
-        console.log(`[DB] Pokémon sincronizados com sucesso (${uniquePokemons.length} processados).`);
+        console.log(`[DB] Pokémon successfully synchronized (${uniquePokemons.length} processed).`);
     } catch (error) {
-        console.error('[DB] Erro ao sincronizar Pokémon:', error);
+        console.error('[DB] Error synchronizing Pokémon:', error);
     }
 }
 
 export async function syncMedicines() {
-    console.log('[DB] Iniciando busca de remédios na OpenFDA API...');
+    console.log('[DB] Fetching medicines from OpenFDA API...');
     const medicineList = [];
 
-    // Busca os dados nas 7 páginas da OpenFDA API
     for (let i = 0; i < 7; i++) {
         const skip = i * 1000;
         const url = `https://api.fda.gov/drug/label.json?limit=1000&skip=${skip}`;
@@ -52,7 +51,7 @@ export async function syncMedicines() {
                 medicineList.push(...medicines);
             }
         } catch (error) {
-            console.error(`[DB] Erro ao buscar página ${i + 1} da API de remédios:`, error);
+            console.error(`[DB] Error fetching page ${i + 1} from medicines API:`, error);
         }
     }
 
@@ -68,8 +67,8 @@ export async function syncMedicines() {
         });
 
         insertMany(uniqueMedicines);
-        console.log(`[DB] Remédios sincronizados com sucesso (${uniqueMedicines.length} processados).`);
+        console.log(`[DB] Medicines successfully synchronized (${uniqueMedicines.length} processed).`);
     } catch (error) {
-        console.error('[DB] Erro ao salvar remédios no banco:', error);
+        console.error('[DB] Error saving medicines to database:', error);
     }
 }
