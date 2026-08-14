@@ -44,13 +44,6 @@ export default async (interaction) => {
     });
 
     collector.on('collect', async (i) => {
-        if (i.user.id !== interaction.user.id) {
-            return i.reply({
-                content: '❌ Apenas o jogador que iniciou a partida pode responder!',
-                ephemeral: true
-            });
-        }
-
         const chosenType = i.customId === 'btn_pokemon' ? 'pokemon' : 'medicine';
         const isCorrect = chosenType === item.type;
 
