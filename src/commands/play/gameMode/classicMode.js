@@ -3,7 +3,7 @@ import { questionEmbed, correctEmbed, wrongEmbed, timeoutEmbed, newPoint } from 
 import { medicineBtn, pokemonBtn, stopBtn } from '../buttons.js';
 import { insertScore } from '../../../funcs/insertScore.js';
 import { getRandomGameItem } from '../../../funcs/getRandom.js';
-import GameLoop from '../gameLoop.js';
+import GameLoop from '../../../class/GameLoop.js';
 
 export default async (interaction) => {
     try {
