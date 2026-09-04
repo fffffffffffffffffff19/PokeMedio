@@ -15,4 +15,12 @@ export function medicineBtn() {
         .setEmoji('💊')
         .setStyle(ButtonStyle.Success);
 };
+
+export function stopBtn() {
+    return new ButtonBuilder()
+        .setCustomId('btn_stop')
+        .setLabel('Stop')
+        .setEmoji('🛑')
+        .setStyle(ButtonStyle.Danger);
+};
 ///////////////////////////
