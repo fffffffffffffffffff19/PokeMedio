@@ -5,6 +5,7 @@ import { insertScore } from '../../../funcs/insertScore.js';
 import { getRandomGameItem } from '../../../funcs/getRandom.js';
 
 let currentGame = null;
+let consecutiveNoResponses = 0;
 
 export default async (interaction) => {
     try {
@@ -72,6 +73,7 @@ class Game {
                     components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
                 });
 
+                consecutiveNoResponses = 0; // Reset consecutive no responses counter
                 await this.start();
             } else {
                 await i.update({
@@ -79,21 +81,34 @@ class Game {
                     components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
                 });
 
-                this.collector.stop('answered');
+                consecutiveNoResponses++;
+                if (consecutiveNoResponses >= 2) {
+                    this.collector.stop('no_response');
+                }
             }
         });
 
         this.collector.on('end', (collected, reason) => {
             if (reason === 'answered') return;
 
-            pokeButton.setDisabled(true);
-            medicineButton.setDisabled(true);
-            stopButton.setDisabled(true);
+            if (reason === 'no_response') {
+                this.interaction.editReply({
+                    embeds: [new EmbedBuilder()
+                        .setTitle('⏰ Tempo Esgotado!')
+                        .setDescription('Você não respondeu em duas rodadas consecutivas. O jogo foi encerrado.')
+                        .setColor('#FEE75C')],
+                    components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                }).catch(() => { });
+            } else {
+                pokeButton.setDisabled(true);
+                medicineButton.setDisabled(true);
+                stopButton.setDisabled(true);
 
-            this.interaction.editReply({
-                embeds: [timeoutEmbed(item)],
-                components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
-            }).catch(() => { });
+                this.interaction.editReply({
+                    embeds: [timeoutEmbed(item)],
+                    components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                }).catch(() => { });
+            }
         });
     }
 
