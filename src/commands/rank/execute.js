@@ -16,7 +16,9 @@ export default (interaction) => {
             .setDescription(`You have been added to the rank list. Your new position is: ${newUser.position} with a score of ${newUser.score}.`)
             .setTimestamp();
 
-        return interaction.reply({ embeds: [embed], flags: ['EPHEMERAL'] });
+        return interaction.reply({ embeds: [embed], fetchReply: true }).then(() => {
+            interaction.editReply({ embeds: [embed], flags: ['EPHEMERAL'] });
+        });
     }
 
     const embed = new EmbedBuilder()
@@ -25,5 +27,7 @@ export default (interaction) => {
         .setDescription(`Your current position is: ${user.position} with a score of ${user.score}.`)
         .setTimestamp();
 
-    return interaction.reply({ embeds: [embed], flags: ['EPHEMERAL'] });
+    return interaction.reply({ embeds: [embed], fetchReply: true }).then(() => {
+        interaction.editReply({ embeds: [embed], flags: ['EPHEMERAL'] });
+    });
 };
