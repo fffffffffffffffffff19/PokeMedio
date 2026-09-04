@@ -17,7 +17,7 @@ export default async (interaction) => {
                 const response = await interaction.reply({
                     embeds: [questionEmbed(item)],
                     components: [row],
-                    withResponse: true
+                    fetchReply: true
                 });
 
                 return response.createMessageComponentCollector({
