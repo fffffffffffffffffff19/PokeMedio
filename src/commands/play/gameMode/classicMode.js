@@ -82,19 +82,23 @@ export default async (interaction) => {
                         await gameLoop.options.onEnd(gameLoop.collector, reason, item);
                     });
                 } else if (reason === 'no_response') {
-                    await interaction.editReply({
-                        embeds: [timeoutEmbed(item)],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
-                    }).catch(() => { });
+                    if (!interaction.replied) {
+                        await interaction.editReply({
+                            embeds: [timeoutEmbed(item)],
+                            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                        }).catch(() => { });
+                    }
                 } else {
-                    pokeButton.setDisabled(true);
-                    medicineButton.setDisabled(true);
-                    stopButton.setDisabled(true);
+                    if (!interaction.replied) {
+                        pokeButton.setDisabled(true);
+                        medicineButton.setDisabled(true);
+                        stopButton.setDisabled(true);
 
-                    await interaction.editReply({
-                        embeds: [timeoutEmbed(item)],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
-                    }).catch(() => { });
+                        await interaction.editReply({
+                            embeds: [timeoutEmbed(item)],
+                            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                        }).catch(() => { });
+                    }
                 }
             }
         });
