@@ -1,6 +1,6 @@
 import classicMode from './gameMode/classicMode.js';
 
-export default async (interaction) => {
+export const modeHandler = async (interaction) => {
     const mode = interaction.options.getString('mode');
 
     switch (mode) {
