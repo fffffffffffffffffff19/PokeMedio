@@ -42,21 +42,46 @@ export default async (interaction) => {
                         components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
                     });
 
-                    return 'answered';
+                    collector.stop('answered');
                 } else {
                     await i.update({
                         embeds: [wrongEmbed(i, item)],
                         components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
                     });
 
-                    return 'wrong';
+                    collector.stop('wrong');
                 }
             },
 
             onEnd: async (collector, reason, item) => {
-                if (reason === 'answered') return;
+                if (reason === 'answered' || reason === 'wrong') {
+                    const newGame = await interaction.reply({
+                        embeds: [questionEmbed(item)],
+                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
+                        fetchReply: true
+                    });
 
-                if (reason === 'no_response') {
+                    collector = newGame.createMessageComponentCollector({
+                        componentType: ComponentType.Button,
+                        time: 15_000
+                    });
+
+                    gameLoop.collector = collector;
+
+                    collector.on('collect', async (i) => {
+                        const result = await gameLoop.options.onCollect(gameLoop.collector, i, item);
+
+                        if (result === 'answered') {
+                            collector.stop('answered');
+                        } else if (result === 'wrong') {
+                            collector.stop('wrong');
+                        }
+                    });
+
+                    collector.on('end', async (collected, reason) => {
+                        await gameLoop.options.onEnd(gameLoop.collector, reason, item);
+                    });
+                } else if (reason === 'no_response') {
                     await interaction.editReply({
                         embeds: [timeoutEmbed(item)],
                         components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
