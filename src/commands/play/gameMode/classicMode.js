@@ -55,10 +55,9 @@ export default async (interaction) => {
 
             onEnd: async (collector, reason, item) => {
                 if (reason === 'answered' || reason === 'wrong') {
-                    const newGame = await interaction.reply({
+                    const newGame = await interaction.editReply({
                         embeds: [questionEmbed(item)],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
-                        fetchReply: true
+                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
                     });
 
                     collector = newGame.createMessageComponentCollector({
