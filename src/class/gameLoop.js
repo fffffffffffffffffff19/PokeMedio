@@ -25,13 +25,8 @@ class GameLoop {
         this.collector.on('collect', async (i) => {
             const result = await this.options.onCollect(this.collector, i, item);
 
-            if (result === 'answered') {
-                this.collector.stop('answered');
-            } else if (result === 'wrong') {
-                this.consecutiveNoResponses++;
-                if (this.consecutiveNoResponses >= 2) {
-                    this.collector.stop('no_response');
-                }
+            if (result === 'answered' || result === 'wrong') {
+                this.collector.stop(result);
             }
         });
 
