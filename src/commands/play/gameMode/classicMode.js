@@ -48,7 +48,7 @@ class Game {
         const response = await this.interaction.reply({
             embeds: [questionEmbed(item)],
             components: [row],
-            withResponse: true
+            fetchReply: true
         });
 
         this.collector = response.createMessageComponentCollector({
