@@ -23,7 +23,7 @@ export default async (interaction) => {
         const response = await interaction.reply({
             embeds: [questionEmbed(item)],
             components: [row],
-            fetchReply: true
+            withResponse: true
         });
 
         const collector = response.createMessageComponentCollector({
@@ -66,7 +66,7 @@ export default async (interaction) => {
             interaction.editReply({
                 embeds: [timeoutEmbed(item)],
                 components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton)]
-            }).catch(() => {});
+            }).catch(() => { });
         });
     } catch (error) {
         console.error('Error in play command:', error);
