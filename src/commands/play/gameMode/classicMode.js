@@ -93,10 +93,7 @@ class Game {
 
             if (reason === 'no_response') {
                 this.interaction.editReply({
-                    embeds: [new EmbedBuilder()
-                        .setTitle('⏰ Tempo Esgotado!')
-                        .setDescription('Você não respondeu em duas rodadas consecutivas. O jogo foi encerrado.')
-                        .setColor('#FEE75C')],
+                    embeds: [timeoutEmbed(item)],
                     components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
                 }).catch(() => { });
             } else {
