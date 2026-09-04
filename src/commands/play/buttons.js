@@ -20,7 +20,7 @@ export function stopBtn() {
     return new ButtonBuilder()
         .setCustomId('btn_stop')
         .setLabel('Stop')
-        .setEmoji('🛑')
+        .setEmoji('⛔')
         .setStyle(ButtonStyle.Danger);
 };
 ///////////////////////////
