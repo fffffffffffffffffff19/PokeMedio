@@ -26,6 +26,7 @@ export default async (interaction) => {
                     time: 15_000
                 });
             },
+
             onCollect: async (collector, i, item) => {
                 const chosenType = i.customId === 'btn_pokemon' ? 'pokemon' : 'medicine';
                 const isCorrect = chosenType === item.type;
@@ -52,6 +53,7 @@ export default async (interaction) => {
                     return 'wrong';
                 }
             },
+
             onEnd: async (collector, reason, item) => {
                 if (reason === 'answered') return;
 
