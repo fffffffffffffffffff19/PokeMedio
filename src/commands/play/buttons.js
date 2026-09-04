@@ -1,5 +1,5 @@
 import { ButtonBuilder, ButtonStyle } from "discord.js";
-
+/////////// main chose Btn
 export function pokemonBtn() {
     return new ButtonBuilder()
         .setCustomId('btn_pokemon')
@@ -15,3 +15,4 @@ export function medicineBtn() {
         .setEmoji('💊')
         .setStyle(ButtonStyle.Success);
 };
+///////////////////////////
