@@ -1,4 +1,3 @@
-import { ActionRowBuilder, ComponentType } from 'discord.js';
 import { modeHandler } from './modeHandler.js';
 
 export default async (interaction) => {

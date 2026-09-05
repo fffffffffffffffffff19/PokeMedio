@@ -5,10 +5,17 @@ class GameLoop {
         this.interaction = interaction;
         this.options = options;
         this.collector = null;
-        this.consecutiveNoResponses = 0;
+        this.isRunning = false;
     }
 
     async start() {
+        this.isRunning = true;
+        await this.runRound();
+    }
+
+    async runRound() {
+        if (!this.isRunning) return;
+
         const item = getRandomGameItem();
 
         if (!item) {
@@ -18,24 +25,38 @@ class GameLoop {
             });
         }
 
-        const collector = await this.options.onStart(item);
-
+        const collector = await this.options.onRoundStart(item);
         this.collector = collector;
 
         this.collector.on('collect', async (i) => {
             const result = await this.options.onCollect(this.collector, i, item);
 
-            if (result === 'answered' || result === 'wrong') {
+            if (result === 'answered' || result === 'wrong' || result === 'stopped') {
                 this.collector.stop(result);
             }
         });
 
         this.collector.on('end', async (collected, reason) => {
-            await this.options.onEnd(this.collector, reason, item);
+            if (reason === 'stopped') {
+                this.isRunning = false;
+                return;
+            }
+
+            if (this.options.onRoundEnd) {
+                await this.options.onRoundEnd(reason, item);
+            }
+
+            // Aguarda o intervalo definido e avança para a próxima rodada se o jogo continuar ativo
+            if (this.isRunning) {
+                setTimeout(() => {
+                    this.runRound();
+                }, this.options.delayBetweenRounds || 3000);
+            }
         });
     }
 
     stop() {
+        this.isRunning = false;
         if (this.collector) {
             this.collector.stop('stopped');
         }
