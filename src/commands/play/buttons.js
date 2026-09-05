@@ -1,5 +1,5 @@
 import { ButtonBuilder, ButtonStyle } from "discord.js";
-/////////// main chose Btn
+/////////// classic mode btns
 export function pokemonBtn() {
     return new ButtonBuilder()
         .setCustomId('btn_pokemon')
@@ -23,4 +23,6 @@ export function stopBtn() {
         .setEmoji('⛔')
         .setStyle(ButtonStyle.Danger);
 };
-///////////////////////////
+/////////// find mode btns
+
+//////////////////////////

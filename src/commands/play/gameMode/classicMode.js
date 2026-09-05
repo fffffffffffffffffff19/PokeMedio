@@ -9,7 +9,7 @@ export default async (interaction) => {
         let isFirstRound = true;
 
         const gameLoop = new GameLoop(interaction, {
-            delayBetweenRounds: 4000, // Tempo de espera (4s) entre as perguntas
+            delayBetweenRounds: 4000,
 
             onRoundStart: async (item) => {
                 const row = new ActionRowBuilder().addComponents(
@@ -24,7 +24,6 @@ export default async (interaction) => {
                     fetchReply: true
                 };
 
-                // Na primeira rodada fazemos .reply(), nas subsequentes .followUp()
                 const response = isFirstRound
                     ? await interaction.reply(payload)
                     : await interaction.followUp(payload);
@@ -48,7 +47,6 @@ export default async (interaction) => {
                 const chosenType = i.customId === 'btn_pokemon' ? 'pokemon' : 'medicine';
                 const isCorrect = chosenType === item.type;
 
-                // Desabilita os botões da mensagem respondida
                 const disabledRow = new ActionRowBuilder().addComponents(
                     pokemonBtn().setDisabled(true),
                     medicineBtn().setDisabled(true),
@@ -72,7 +70,6 @@ export default async (interaction) => {
             },
 
             onRoundEnd: async (reason, item) => {
-                // Caso o tempo esgotar sem resposta
                 if (reason === 'time') {
                     await interaction.followUp({
                         embeds: [timeoutEmbed(item)]

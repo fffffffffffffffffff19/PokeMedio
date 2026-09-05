@@ -1,6 +1,23 @@
 import { EmbedBuilder } from "discord.js";
 import { getRank } from "../../funcs/getRank.js";
 
+export function newPoint(user) {
+	const userRank = getRank(user);
+
+	return new EmbedBuilder()
+		.setTitle('🏅 +1 Score!')
+		.setDescription(`<@${user.id}> esta em Rank: **#${userRank.position}** com **${userRank.score}** pontos!`)
+		.setColor("Gold");
+};
+
+export function gameStoppedEmbed() {
+	return new EmbedBuilder()
+		.setTitle('🎮 Jogo Encerrado!')
+		.setDescription('O jogo foi encerrado. Tente novamente mais tarde.')
+		.setColor('#FF0000');
+};
+
+////////////// classic mode embeds
 export function questionEmbed(item) {
 	return new EmbedBuilder()
 		.setTitle('❓ Pokémon ou Remédio?')
@@ -31,18 +48,4 @@ export function timeoutEmbed(item) {
 		.setColor('#FEE75C');
 };
 
-export function newPoint(user) {
-	const userRank = getRank(user);
-
-	return new EmbedBuilder()
-		.setTitle('🏅 +1 Score!')
-		.setDescription(`<@${user.id}> esta em Rank: **#${userRank.position}** com **${userRank.score}** pontos!`)
-		.setColor("Gold");
-};
-
-export function gameStoppedEmbed() {
-	return new EmbedBuilder()
-		.setTitle('🎮 Jogo Encerrado!')
-		.setDescription('O jogo foi encerrado. Tente novamente mais tarde.')
-		.setColor('#FF0000');
-};
+////////////// find mode embeds
