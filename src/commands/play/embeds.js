@@ -49,7 +49,7 @@ export function timeoutEmbed(item) {
 };
 
 ////////////// find mode embeds
-export function questionEmbed(items) {
+export function questionFindEmbed(items) {
     return new EmbedBuilder()
         .setTitle('🔍 Encontre o Pokémon!')
         .setDescription(`Escolha o item que é um Pokémon entre os 4 abaixo:`)
