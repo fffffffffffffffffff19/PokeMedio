@@ -39,3 +39,10 @@ export function newPoint(user) {
 		.setDescription(`<@${user.id}> esta em Rank: **#${userRank.position}** com **${userRank.score}** pontos!`)
 		.setColor("Gold");
 };
+
+export function gameStoppedEmbed() {
+	return new EmbedBuilder()
+		.setTitle('🎮 Jogo Encerrado!')
+		.setDescription('O jogo foi encerrado. Tente novamente mais tarde.')
+		.setColor('#FF0000');
+};
