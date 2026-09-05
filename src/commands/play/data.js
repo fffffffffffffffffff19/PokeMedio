@@ -9,5 +9,6 @@ export default new SlashCommandBuilder()
             .setRequired(true)
             .addChoices(
                 { name: 'Classic', value: 'classic' },
+                { name: 'Find the Pokémon', value: 'find_pokemon' },
                 { name: 'Other Mode', value: 'other_mode' }
             ));

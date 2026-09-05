@@ -1,4 +1,5 @@
 import classicMode from './gameMode/classicMode.js';
+import findMode from './gameMode/findMode.js';
 
 export const modeHandler = async (interaction) => {
     const mode = interaction.options.getString('mode');
@@ -6,6 +7,8 @@ export const modeHandler = async (interaction) => {
     switch (mode) {
         case 'classic':
             return await classicMode(interaction);
+        case 'find_pokemon':
+            return await findMode(interaction);
         case 'other_mode':
             // Handle other mode logic here
             return await otherMode(interaction);
