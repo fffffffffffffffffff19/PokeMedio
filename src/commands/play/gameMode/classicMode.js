@@ -10,10 +10,10 @@ export default async (interaction) => {
         const medicineButton = medicineBtn();
         const stopButton = stopBtn();
 
+        const row = new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton);
+
         const gameLoop = new GameLoop(interaction, {
             onStart: async (item) => {
-                const row = new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton);
-
                 const response = await interaction.reply({
                     embeds: [questionEmbed(item)],
                     components: [row],
@@ -28,15 +28,10 @@ export default async (interaction) => {
 
             onCollect: async (collector, i, item) => {
                 if (i.customId === 'btn_stop') {
-                    pokeButton.setDisabled(true);
-                    medicineButton.setDisabled(true);
-                    stopButton.setDisabled(true);
-
                     collector.stop('stopped');
 
                     await i.reply({
-                        embeds: [gameStoppedEmbed()],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                        embeds: [gameStoppedEmbed()]
                     });
                     return;
                 }
@@ -53,14 +48,14 @@ export default async (interaction) => {
 
                     await i.reply({
                         embeds: [correctEmbed(i, item), newPoint(i.user)],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                        components: [row]
                     });
 
                     collector.stop('answered');
                 } else {
                     await i.reply({
                         embeds: [wrongEmbed(i, item)],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                        components: [row]
                     });
 
                     collector.stop('wrong');
@@ -73,7 +68,7 @@ export default async (interaction) => {
 
                     const newGame = await interaction.followUp({
                         embeds: [questionEmbed(item)],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
+                        components: [row],
                         fetchReply: true
                     });
 
@@ -104,7 +99,7 @@ export default async (interaction) => {
                 if (reason === 'answered' || reason === 'wrong') {
                     const newGame = await interaction.followUp({
                         embeds: [questionEmbed(item)],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
+                        components: [row],
                         fetchReply: true
                     });
 
@@ -130,24 +125,16 @@ export default async (interaction) => {
                     });
                 } else if (reason === 'no_response') {
                     if (!interaction.replied) {
-                        pokeButton.setDisabled(true);
-                        medicineButton.setDisabled(true);
-                        stopButton.setDisabled(true);
 
                         await interaction.followUp({
-                            embeds: [timeoutEmbed(item)],
-                            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                            embeds: [timeoutEmbed(item)]
                         }).catch(() => { });
                     }
                 } else {
                     if (!interaction.replied) {
-                        pokeButton.setDisabled(true);
-                        medicineButton.setDisabled(true);
-                        stopButton.setDisabled(true);
 
                         await interaction.followUp({
-                            embeds: [timeoutEmbed(item)],
-                            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                            embeds: [timeoutEmbed(item)]
                         }).catch(() => { });
                     }
                 }
