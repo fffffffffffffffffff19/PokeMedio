@@ -30,9 +30,10 @@ export default async (interaction) => {
                 if (i.customId === 'btn_stop') {
                     collector.stop('stopped');
 
-                    await i.reply({
-                        embeds: [gameStoppedEmbed()]
-                    });
+                    await i.reply({ embeds: [gameStoppedEmbed()] });
+
+                    await interaction.deleteReply();
+
                     return;
                 }
 
