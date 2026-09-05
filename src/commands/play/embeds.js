@@ -56,8 +56,8 @@ export function questionEmbed(items) {
         .addFields(
             { name: '1️⃣', value: `**\`${items[0].name}\`**` },
             { name: '2️⃣', value: `**\`${items[1].name}\`**` },
-            { name: '3️⃣', value: `**\`${items[2].name}\`**` },
-            { name: '4️⃣', value: `**\`${items[3].name}\`**` }
+            { name: '3️⣴', value: `**\`${items[2].name}\`**` },
+            { name: '4️⣴', value: `**\`${items[3].name}\`**` }
         )
         .setColor('#5865F2')
         .setFooter({ text: 'Você tem 15 segundos para responder!' })
