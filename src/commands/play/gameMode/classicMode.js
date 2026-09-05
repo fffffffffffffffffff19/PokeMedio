@@ -29,6 +29,10 @@ export default async (interaction) => {
             onCollect: async (collector, i, item) => {
                 if (i.customId === 'btn_stop') {
                     collector.stop('stopped');
+                    await i.reply({
+                        embeds: [gameStoppedEmbed()],
+                        ephemeral: true
+                    });
                     return;
                 }
 
