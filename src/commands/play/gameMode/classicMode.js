@@ -17,7 +17,7 @@ export default async (interaction) => {
                 const response = await interaction.reply({
                     embeds: [questionEmbed(item)],
                     components: [row],
-                    withResponse: true
+                    fetchReply: true
                 });
 
                 return response.createMessageComponentCollector({
@@ -37,16 +37,18 @@ export default async (interaction) => {
                 if (isCorrect) {
                     insertScore(i.user);
 
-                    await i.update({
+                    await i.reply({
                         embeds: [correctEmbed(i, item), newPoint(i.user)],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
+                        ephemeral: true
                     });
 
                     collector.stop('answered');
                 } else {
-                    await i.update({
+                    await i.reply({
                         embeds: [wrongEmbed(i, item)],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
+                        ephemeral: true
                     });
 
                     collector.stop('wrong');
@@ -55,9 +57,10 @@ export default async (interaction) => {
 
             onEnd: async (collector, reason, item) => {
                 if (reason === 'answered' || reason === 'wrong') {
-                    const newGame = await interaction.editReply({
+                    const newGame = await interaction.followUp({
                         embeds: [questionEmbed(item)],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
+                        fetchReply: true
                     });
 
                     collector = newGame.createMessageComponentCollector({
@@ -82,9 +85,10 @@ export default async (interaction) => {
                     });
                 } else if (reason === 'no_response') {
                     if (!interaction.replied) {
-                        await interaction.editReply({
+                        await interaction.followUp({
                             embeds: [timeoutEmbed(item)],
-                            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
+                            ephemeral: true
                         }).catch(() => { });
                     }
                 } else {
@@ -93,9 +97,10 @@ export default async (interaction) => {
                         medicineButton.setDisabled(true);
                         stopButton.setDisabled(true);
 
-                        await interaction.editReply({
+                        await interaction.followUp({
                             embeds: [timeoutEmbed(item)],
-                            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
+                            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
+                            ephemeral: true
                         }).catch(() => { });
                     }
                 }
