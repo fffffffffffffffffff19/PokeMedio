@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ComponentType } from 'discord.js';
-import { questionEmbed, correctEmbed, wrongEmbed, timeoutEmbed, newPoint } from '../embeds.js';
+import { questionEmbed, correctEmbed, wrongEmbed, timeoutEmbed, newPoint, gameStoppedEmbed } from '../embeds.js';
 import { medicineBtn, pokemonBtn, stopBtn } from '../buttons.js';
 import { insertScore } from '../../../funcs/insertScore.js';
 import GameLoop from '../../../class/gameLoop.js';
@@ -27,6 +27,11 @@ export default async (interaction) => {
             },
 
             onCollect: async (collector, i, item) => {
+                if (i.customId === 'btn_stop') {
+                    collector.stop('stopped');
+                    return;
+                }
+
                 const chosenType = i.customId === 'btn_pokemon' ? 'pokemon' : 'medicine';
                 const isCorrect = chosenType === item.type;
 
@@ -51,6 +56,39 @@ export default async (interaction) => {
 
                     collector.stop('wrong');
                 }
+
+                setTimeout(async () => {
+                    pokeButton.setDisabled(false);
+                    medicineButton.setDisabled(false);
+                    stopButton.setDisabled(false);
+
+                    const newGame = await interaction.followUp({
+                        embeds: [questionEmbed(item)],
+                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
+                        fetchReply: true
+                    });
+
+                    collector = newGame.createMessageComponentCollector({
+                        componentType: ComponentType.Button,
+                        time: 15_000
+                    });
+
+                    gameLoop.collector = collector;
+
+                    collector.on('collect', async (i) => {
+                        const result = await gameLoop.options.onCollect(gameLoop.collector, i, item);
+
+                        if (result === 'answered') {
+                            collector.stop('answered');
+                        } else if (result === 'wrong') {
+                            collector.stop('wrong');
+                        }
+                    });
+
+                    collector.on('end', async (collected, reason) => {
+                        await gameLoop.options.onEnd(gameLoop.collector, reason, item);
+                    });
+                }, 4000);
             },
 
             onEnd: async (collector, reason, item) => {

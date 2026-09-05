@@ -22,7 +22,7 @@ export function wrongEmbed(i, item) {
 		.setTitle('❌ Errou!')
 		.setDescription(`Que pena **${i.user.username}**! **\`${item.name}\`** na verdade é um **${item.type === 'pokemon' ? 'Pokémon 🔴' : 'Remédio 💊'}**!`)
 		.setColor('#ED4245');
-}
+};
 
 export function timeoutEmbed(item) {
 	return new EmbedBuilder()
