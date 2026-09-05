@@ -1,4 +1,5 @@
 import { EmbedBuilder } from "discord.js";
+import { getRank } from "../../funcs/getRank.js";
 
 export function newPoint(user) {
     const userRank = getRank(user);
@@ -63,14 +64,14 @@ export function questionEmbed(items) {
         .setTimestamp();
 };
 
-export function correctEmbed(i, item) {
+export function correctFindEmbed(i, item) {
     return new EmbedBuilder()
         .setTitle('🎉 Acertou!')
         .setDescription(`Parabéns **${i.user.username}**! **\`${item.name}\`** realmente é um **Pokémon 🔴**!`)
         .setColor('#57F287');
 };
 
-export function wrongEmbed(i, item) {
+export function wrongFindEmbed(i, item) {
     return new EmbedBuilder()
         .setTitle('❌ Errou!')
         .setDescription(`Que pena **${i.user.username}**! **\`${item.name}\`** na verdade é um **Remédio 💊**!`)

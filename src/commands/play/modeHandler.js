@@ -9,9 +9,6 @@ export const modeHandler = async (interaction) => {
             return await classicMode(interaction);
         case 'find_pokemon':
             return await findMode(interaction);
-        case 'other_mode':
-            // Handle other mode logic here
-            return await otherMode(interaction);
         default:
             return interaction.reply({
                 content: '⚠️ Invalid game mode selected.',

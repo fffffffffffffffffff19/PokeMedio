@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ComponentType } from 'discord.js';
-import { questionEmbed, correctEmbed, wrongEmbed, timeoutEmbed, newPoint, gameStoppedEmbed } from '../embeds.js';
+import { questionEmbed, correctFindEmbed, wrongFindEmbed, timeoutEmbed, newPoint, gameStoppedEmbed } from '../embeds.js';
 import { medicineBtn, stopBtn } from '../buttons.js';
 import { insertScore } from '../../../funcs/insertScore.js';
 import GameLoop from '../../../class/gameLoop.js';
@@ -65,13 +65,13 @@ export default async (interaction) => {
                 if (isCorrect) {
                     insertScore(i.user);
                     await i.update({
-                        embeds: [correctEmbed(i, item), newPoint(i.user)],
+                        embeds: [correctFindEmbed(i, item), newPoint(i.user)],
                         components: [disabledRow]
                     });
                     return 'answered';
                 } else {
                     await i.update({
-                        embeds: [wrongEmbed(i, item)],
+                        embeds: [wrongFindEmbed(i, item)],
                         components: [disabledRow]
                     });
                     return 'wrong';
