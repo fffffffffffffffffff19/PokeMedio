@@ -12,6 +12,8 @@ export default async (interaction) => {
 
         const row = new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton);
 
+        let initialMessageId = null;
+
         const gameLoop = new GameLoop(interaction, {
             onStart: async (item) => {
                 const response = await interaction.reply({
@@ -19,6 +21,8 @@ export default async (interaction) => {
                     components: [row],
                     fetchReply: true
                 });
+
+                initialMessageId = response.id;
 
                 return response.createMessageComponentCollector({
                     componentType: ComponentType.Button,
@@ -30,9 +34,15 @@ export default async (interaction) => {
                 if (i.customId === 'btn_stop') {
                     collector.stop('stopped');
 
-                    await i.reply({ embeds: [gameStoppedEmbed()] });
+                    await i.reply({
+                        embeds: [gameStoppedEmbed()],
+                        ephemeral: true
+                    });
 
-                    await interaction.deleteReply();
+                    // Delete the initial interaction reply
+                    if (initialMessageId) {
+                        await interaction.channel.messages.delete(initialMessageId);
+                    }
 
                     return;
                 }
@@ -126,14 +136,12 @@ export default async (interaction) => {
                     });
                 } else if (reason === 'no_response') {
                     if (!interaction.replied) {
-
                         await interaction.followUp({
                             embeds: [timeoutEmbed(item)]
                         }).catch(() => { });
                     }
                 } else {
                     if (!interaction.replied) {
-
                         await interaction.followUp({
                             embeds: [timeoutEmbed(item)]
                         }).catch(() => { });
