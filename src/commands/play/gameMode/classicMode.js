@@ -29,9 +29,9 @@ export default async (interaction) => {
             onCollect: async (collector, i, item) => {
                 if (i.customId === 'btn_stop') {
                     collector.stop('stopped');
+
                     await i.reply({
-                        embeds: [gameStoppedEmbed()],
-                        ephemeral: true
+                        embeds: [gameStoppedEmbed()]
                     });
                     return;
                 }
@@ -132,10 +132,6 @@ export default async (interaction) => {
                     }
                 } else {
                     if (!interaction.replied) {
-                        pokeButton.setDisabled(true);
-                        medicineButton.setDisabled(true);
-                        stopButton.setDisabled(true);
-
                         await interaction.followUp({
                             embeds: [timeoutEmbed(item)],
                             components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
