@@ -39,16 +39,14 @@ export default async (interaction) => {
 
                     await i.reply({
                         embeds: [correctEmbed(i, item), newPoint(i.user)],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
-                        ephemeral: true
+                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
                     });
 
                     collector.stop('answered');
                 } else {
                     await i.reply({
                         embeds: [wrongEmbed(i, item)],
-                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
-                        ephemeral: true
+                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
                     });
 
                     collector.stop('wrong');
@@ -87,8 +85,7 @@ export default async (interaction) => {
                     if (!interaction.replied) {
                         await interaction.followUp({
                             embeds: [timeoutEmbed(item)],
-                            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
-                            ephemeral: true
+                            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
                         }).catch(() => { });
                     }
                 } else {
@@ -99,8 +96,7 @@ export default async (interaction) => {
 
                         await interaction.followUp({
                             embeds: [timeoutEmbed(item)],
-                            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)],
-                            ephemeral: true
+                            components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
                         }).catch(() => { });
                     }
                 }
