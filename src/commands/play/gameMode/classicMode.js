@@ -28,10 +28,15 @@ export default async (interaction) => {
 
             onCollect: async (collector, i, item) => {
                 if (i.customId === 'btn_stop') {
+                    pokeButton.setDisabled(true);
+                    medicineButton.setDisabled(true);
+                    stopButton.setDisabled(true);
+
                     collector.stop('stopped');
 
                     await i.reply({
-                        embeds: [gameStoppedEmbed()]
+                        embeds: [gameStoppedEmbed()],
+                        components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
                     });
                     return;
                 }
@@ -125,6 +130,10 @@ export default async (interaction) => {
                     });
                 } else if (reason === 'no_response') {
                     if (!interaction.replied) {
+                        pokeButton.setDisabled(true);
+                        medicineButton.setDisabled(true);
+                        stopButton.setDisabled(true);
+
                         await interaction.followUp({
                             embeds: [timeoutEmbed(item)],
                             components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
@@ -132,6 +141,10 @@ export default async (interaction) => {
                     }
                 } else {
                     if (!interaction.replied) {
+                        pokeButton.setDisabled(true);
+                        medicineButton.setDisabled(true);
+                        stopButton.setDisabled(true);
+
                         await interaction.followUp({
                             embeds: [timeoutEmbed(item)],
                             components: [new ActionRowBuilder().addComponents(pokeButton, medicineButton, stopButton)]
