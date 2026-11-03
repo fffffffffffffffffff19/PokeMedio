@@ -6,6 +6,7 @@ class GameLoop {
         this.options = options;
         this.collector = null;
         this.isRunning = false;
+        this.consecutiveTimeouts = 0;
     }
 
     async start() {
@@ -42,8 +43,21 @@ class GameLoop {
                 return;
             }
 
+            this.consecutiveTimeouts = reason === 'time'
+                ? this.consecutiveTimeouts + 1
+                : 0;
+
             if (this.options.onRoundEnd) {
                 await this.options.onRoundEnd(reason, item);
+            }
+
+            if (this.options.maxConsecutiveTimeouts &&
+                this.consecutiveTimeouts >= this.options.maxConsecutiveTimeouts) {
+                this.isRunning = false;
+                if (this.options.onMaxConsecutiveTimeouts) {
+                    await this.options.onMaxConsecutiveTimeouts();
+                }
+                return;
             }
 
             // Aguarda o intervalo definido e avança para a próxima rodada se o jogo continuar ativo

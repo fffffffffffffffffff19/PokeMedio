@@ -1,41 +1,68 @@
 import { ActionRowBuilder, ComponentType } from 'discord.js';
-import { questionEmbed, correctFindEmbed, wrongFindEmbed, timeoutEmbed, newPoint, gameStoppedEmbed } from '../embeds.js';
-import { medicineBtn, stopBtn } from '../buttons.js';
+import { questionFindEmbed, correctEmbed, wrongFindEmbed, timeoutEmbed, newPoint, gameStoppedEmbed } from '../embeds.js';
+import { numberBtn, stopBtn } from '../buttons.js';
 import { insertScore } from '../../../funcs/insertScore.js';
+import { getRandomMedicine } from '../../../funcs/getMedicine.js';
+import { getPokemonDetails, getRandomPokemon } from '../../../funcs/getPokemon.js';
 import GameLoop from '../../../class/gameLoop.js';
 
 export default async (interaction) => {
     try {
         let isFirstRound = true;
+        let currentItems = [];
+        let correctPokemon = null;
+        let lastMessage = null;
 
         const gameLoop = new GameLoop(interaction, {
             delayBetweenRounds: 4000,
+            maxConsecutiveTimeouts: 3,
 
-            onRoundStart: async (item) => {
-                const pokemon = item;
-                const medicines = Array.from({ length: 3 }, () => getRandomMedicine()).map((medicine) => ({ name: medicine, type: 'medicine' }));
+            onMaxConsecutiveTimeouts: async () => {
+                await interaction.followUp({ embeds: [gameStoppedEmbed()] });
+            },
 
-                const items = [pokemon, ...medicines].sort(() => Math.random() - 0.5);
+            onRoundStart: async () => {
+                const pokemonName = getRandomPokemon();
+                const pokemon = { name: pokemonName, type: 'pokemon' };
+                correctPokemon = pokemon;
+
+                const medicines = [];
+                const usedNames = new Set([pokemonName]);
+
+                while (medicines.length < 3) {
+                    const medName = getRandomMedicine();
+                    if (medName && !usedNames.has(medName)) {
+                        usedNames.add(medName);
+                        medicines.push({ name: medName, type: 'medicine' });
+                    }
+                }
+
+                currentItems = [pokemon, ...medicines].sort(() => Math.random() - 0.5);
 
                 const row = new ActionRowBuilder().addComponents(
-                    pokemonBtn().setDisabled(false),
-                    medicineBtn().setDisabled(false),
-                    medicineBtn().setDisabled(false),
-                    medicineBtn().setDisabled(false),
+                    numberBtn(1).setDisabled(false),
+                    numberBtn(2).setDisabled(false),
+                    numberBtn(3).setDisabled(false),
+                    numberBtn(4).setDisabled(false),
                     stopBtn().setDisabled(false)
                 );
 
                 const payload = {
-                    embeds: [questionEmbed(items)],
+                    embeds: [questionFindEmbed(currentItems)],
                     components: [row],
                     fetchReply: true
                 };
 
-                const response = isFirstRound
-                    ? await interaction.reply(payload)
-                    : await interaction.followUp(payload);
+                let response;
+                if (isFirstRound) {
+                    await interaction.reply(payload);
+                    response = await interaction.fetchReply();
+                } else {
+                    response = await interaction.followUp(payload);
+                }
 
                 isFirstRound = false;
+                lastMessage = response;
 
                 return response.createMessageComponentCollector({
                     componentType: ComponentType.Button,
@@ -43,7 +70,7 @@ export default async (interaction) => {
                 });
             },
 
-            onCollect: async (collector, i, item) => {
+            onCollect: async (collector, i) => {
                 if (i.customId === 'btn_stop') {
                     gameLoop.stop();
                     await i.reply({ embeds: [gameStoppedEmbed()] });
@@ -51,38 +78,39 @@ export default async (interaction) => {
                     return 'stopped';
                 }
 
-                const chosenType = i.customId === 'btn_opt_1' ? 'pokemon' : 'medicine';
-                const isCorrect = chosenType === item.type;
+                const selectedIndex = parseInt(i.customId.replace('btn_opt_', '')) - 1;
+                const selectedItem = currentItems[selectedIndex];
 
-                const disabledRow = new ActionRowBuilder().addComponents(
-                    pokemonBtn().setDisabled(true),
-                    medicineBtn().setDisabled(true),
-                    medicineBtn().setDisabled(true),
-                    medicineBtn().setDisabled(true),
-                    stopBtn().setDisabled(true)
-                );
+                const isCorrect = selectedItem && selectedItem.type === 'pokemon';
 
                 if (isCorrect) {
                     insertScore(i.user);
-                    await i.update({
-                        embeds: [correctFindEmbed(i, item), newPoint(i.user)],
-                        components: [disabledRow]
-                    });
+                    await i.deferUpdate();
+                    const pokemon = await getPokemonDetails(correctPokemon.name);
+                    await i.followUp({ embeds: [correctEmbed(i, correctPokemon, pokemon), newPoint(i.user)] });
+                    await i.message.delete().catch(() => { });
                     return 'answered';
                 } else {
-                    await i.update({
-                        embeds: [wrongFindEmbed(i, item)],
-                        components: [disabledRow]
-                    });
+                    await i.deferUpdate();
+                    const pokemon = await getPokemonDetails(correctPokemon.name);
+                    await i.followUp({ embeds: [wrongFindEmbed(i, selectedItem, correctPokemon, pokemon)] });
+                    await i.message.delete().catch(() => { });
                     return 'wrong';
                 }
             },
 
-            onRoundEnd: async (reason, item) => {
+            onRoundEnd: async (reason) => {
+                // Trata o Timeout (15 segundos sem resposta)
                 if (reason === 'time') {
+                    const pokemon = await getPokemonDetails(correctPokemon.name);
                     await interaction.followUp({
-                        embeds: [timeoutEmbed(item)]
+                        embeds: [timeoutEmbed(correctPokemon, pokemon)]
                     });
+
+                    // Apaga a mensagem anterior da pergunta que expirou
+                    if (lastMessage) {
+                        await lastMessage.delete().catch(() => { });
+                    }
                 }
             }
         });
