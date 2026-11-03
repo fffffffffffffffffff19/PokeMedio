@@ -2,11 +2,13 @@ import { ActionRowBuilder, ComponentType } from 'discord.js';
 import { questionEmbed, correctEmbed, wrongEmbed, timeoutEmbed, newPoint, gameStoppedEmbed } from '../embeds.js';
 import { medicineBtn, pokemonBtn, stopBtn } from '../buttons.js';
 import { insertScore } from '../../../funcs/insertScore.js';
+import { getPokemonDetails } from '../../../funcs/getPokemon.js';
 import GameLoop from '../../../class/gameLoop.js';
 
 export default async (interaction) => {
     try {
         let isFirstRound = true;
+        let lastMessage = null;
 
         const gameLoop = new GameLoop(interaction, {
             delayBetweenRounds: 4000,
@@ -24,11 +26,16 @@ export default async (interaction) => {
                     fetchReply: true
                 };
 
-                const response = isFirstRound
-                    ? await interaction.reply(payload)
-                    : await interaction.followUp(payload);
+                let response;
+                if (isFirstRound) {
+                    await interaction.reply(payload);
+                    response = await interaction.fetchReply();
+                } else {
+                    response = await interaction.followUp(payload);
+                }
 
                 isFirstRound = false;
+                lastMessage = response;
 
                 return response.createMessageComponentCollector({
                     componentType: ComponentType.Button,
@@ -47,33 +54,35 @@ export default async (interaction) => {
                 const chosenType = i.customId === 'btn_pokemon' ? 'pokemon' : 'medicine';
                 const isCorrect = chosenType === item.type;
 
-                const disabledRow = new ActionRowBuilder().addComponents(
-                    pokemonBtn().setDisabled(true),
-                    medicineBtn().setDisabled(true),
-                    stopBtn().setDisabled(true)
-                );
-
                 if (isCorrect) {
                     insertScore(i.user);
-                    await i.update({
-                        embeds: [correctEmbed(i, item), newPoint(i.user)],
-                        components: [disabledRow]
-                    });
+                    await i.deferUpdate();
+                    const pokemon = item.type === 'pokemon'
+                        ? await getPokemonDetails(item.name)
+                        : null;
+                    await i.followUp({ embeds: [correctEmbed(i, item, pokemon), newPoint(i.user)] });
+                    await i.message.delete().catch(() => { });
                     return 'answered';
                 } else {
-                    await i.update({
-                        embeds: [wrongEmbed(i, item)],
-                        components: [disabledRow]
-                    });
+                    await i.deferUpdate();
+                    const pokemon = item.type === 'pokemon'
+                        ? await getPokemonDetails(item.name)
+                        : null;
+                    await i.followUp({ embeds: [wrongEmbed(i, item, pokemon)] });
+                    await i.message.delete().catch(() => { });
                     return 'wrong';
                 }
             },
 
             onRoundEnd: async (reason, item) => {
                 if (reason === 'time') {
+                    const pokemon = item.type === 'pokemon'
+                        ? await getPokemonDetails(item.name)
+                        : null;
                     await interaction.followUp({
-                        embeds: [timeoutEmbed(item)]
+                        embeds: [timeoutEmbed(item, pokemon)]
                     });
+                    if (lastMessage) await lastMessage.delete().catch(() => { });
                 }
             }
         });
